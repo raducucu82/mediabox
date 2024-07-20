@@ -1,0 +1,31 @@
+log:
+  level: DEBUG 
+
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+  
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+certificatesResolvers:
+  lets-encr:
+    acme:
+      caServer: https://acme-v02.api.letsencrypt.org/directory
+      storage: acme.json
+      email: o5vl5nds@mailer.me 
+      httpChallenge:
+        entryPoint: web

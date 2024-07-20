@@ -1,0 +1,29 @@
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/Bucharest
+    volumes:
+      - /data/bazarr/config:/config
+      - /media/big/media:/media
+      - /media/big/downloads:/downloads
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      - qbt-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/bazarr`)"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.tls.certresolver=lets-encr"
+
+
+networks:
+  qbt-network:
+    external: true

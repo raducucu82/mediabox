@@ -1,0 +1,8 @@
+# Everything
+*
+
+# Except
+!*/
+.*
+!.gitignore
+!docker-compose.yml

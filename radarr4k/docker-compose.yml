@@ -1,0 +1,28 @@
+services:
+  radarr4k:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr4k
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Etc/UTC
+    volumes:
+      - /data/radarr4k/config:/config
+      - /media/big/media4k:/media4k
+      - /media/big/downloads:/downloads
+    ports:
+      - 7879:7879
+    networks:
+      - qbt-network
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr4k.entrypoints=websecure"
+      - "traefik.http.routers.radarr4k.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/radarr4k`)"
+      - "traefik.http.services.radarr4k.loadbalancer.server.port=7879"
+      - "traefik.http.routers.radarr4k.tls=true"
+      - "traefik.http.routers.radarr4k.tls.certresolver=lets-encr"
+
+networks:
+  qbt-network:
+    external: true

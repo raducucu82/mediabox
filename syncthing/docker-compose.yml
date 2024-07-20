@@ -1,0 +1,30 @@
+services:
+  syncthing:
+    image: syncthing/syncthing
+    container_name: syncthing
+    hostname: mediabox-syncthing
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /media/big/syncthing:/var/syncthing
+    networks:
+      - qbt-network
+    ports:
+      - 8384:8384 # Web UI
+      - 22000:22000/tcp # TCP file transfers
+      - 22000:22000/udp # QUIC file transfers
+      - 21027:21027/udp # Receive local discovery broadcasts
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.qbtbox.duckdns.org`)"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.tls.certresolver=lets-encr"
+
+
+networks:
+  qbt-network:
+    external: true

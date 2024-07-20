@@ -1,0 +1,27 @@
+services:
+  portainer:
+    image: "portainer/portainer-ce:latest"
+    container_name: portainer
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+    networks:
+      - qbt-network
+    ports:
+      - 9000:9000
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./portainer-data:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.rule=Host(`portainer-my.duckdns.org`)"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=lets-encr"
+
+networks:
+  qbt-network:
+    external: true

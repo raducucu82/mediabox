@@ -1,0 +1,16 @@
+services:
+  duckdns:
+    image: lscr.io/linuxserver/duckdns:latest
+    container_name: duckdns
+    network_mode: host #optional
+    environment:
+      - PUID=1000 #optional
+      - PGID=1000 #optional
+      - TZ=Europe/Bucharest #optional
+      - SUBDOMAINS=calibreweb-my,emby-my,portainer-my,qbt-my,qbtbox
+      - TOKEN=5993b96c-d68b-4f65-987a-44b2efcd411c
+      - UPDATE_IP=ipv4 #optional
+      - LOG_FILE=false #optional
+    volumes:
+      - /data/duckdns/config:/config #optional
+    restart: unless-stopped

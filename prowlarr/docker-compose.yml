@@ -1,0 +1,26 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Etc/UTC
+    volumes:
+      - /data/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      - qbt-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/prowlarr`)"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.tls.certresolver=lets-encr"
+
+networks:
+  qbt-network:
+    external: true

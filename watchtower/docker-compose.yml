@@ -1,0 +1,12 @@
+services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - TZ=Europe/Bucharest
+      - WATCHTOWER_SCHEDULE=0 30 5 * * *
+    command: --cleanup --debug
+    restart: unless-stopped
+

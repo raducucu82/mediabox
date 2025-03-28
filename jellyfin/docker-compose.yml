@@ -14,26 +14,29 @@ services:
       - PGID=1001
       - TZ=Europe/Bucharest
     volumes:
-      - /data/jellyfin/cache:/cache
-      - /data/jellyfin/config:/config
-      - /media/big/media:/media
-      - /media/big/media4k:/media4k
-      - /media/big/downloads:/downloads
+      - ./cache:/cache
+      - ./config:/config
+      - /media/big1/media:/media
+      - /media/big1/media4k:/media4k
+      - /media/big1/downloads:/downloads
+      - /media/big2/media:/media2
+      - /media/big2/shared:/shared
+      - /media/big2/media4k:/media4k2
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all 
-              capabilities: [gpu, utility, video]
+    # deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - driver: nvidia
+    #          count: all 
+    #         capabilities: [gpu, utility, video]
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyfin.entrypoints=websecure"
-      - "traefik.http.routers.jellyfin.rule=Host(`emby-my.duckdns.org`)"
+      - "traefik.http.routers.jellyfin.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.${DOMAIN}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.jellyfin.tls.certresolver=myresolver"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-      - "traefik.http.routers.jellyfin.tls=true"
-      - "traefik.http.routers.jellyfin.tls.certresolver=lets-encr"
 
 networks:
   qbt-network:

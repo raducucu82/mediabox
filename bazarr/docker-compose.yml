@@ -7,9 +7,9 @@ services:
       - PGID=1001
       - TZ=Europe/Bucharest
     volumes:
-      - /data/bazarr/config:/config
-      - /media/big/media:/media
-      - /media/big/downloads:/downloads
+      - ./config:/config
+      - /media/big1/media:/media
+      - /media/big1/downloads:/downloads
     ports:
       - 6767:6767
     restart: unless-stopped
@@ -17,12 +17,11 @@ services:
       - qbt-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.entrypoints=websecure"
-      - "traefik.http.routers.bazarr.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/bazarr`)"
+      - "traefik.http.routers.bazarr.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.bazarr.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.bazarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.bazarr.rule=Host(`${DOMAIN}`) && PathPrefix(`/bazarr`)"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
-      - "traefik.http.routers.bazarr.tls=true"
-      - "traefik.http.routers.bazarr.tls.certresolver=lets-encr"
-
 
 networks:
   qbt-network:

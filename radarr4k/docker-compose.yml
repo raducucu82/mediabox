@@ -7,21 +7,23 @@ services:
       - PGID=1001
       - TZ=Etc/UTC
     volumes:
-      - /data/radarr4k/config:/config
-      - /media/big/media4k:/media4k
-      - /media/big/downloads:/downloads
+      - ./config:/config
+      - /media/big1/media4k:/media4k
+      - /media/big2/media4k:/media4k2
+      - /media/big1/downloads:/downloads
     ports:
-      - 7879:7879
+      - 7879:7878
+    hostname: radarr4k
     networks:
       - qbt-network
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.radarr4k.entrypoints=websecure"
-      - "traefik.http.routers.radarr4k.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/radarr4k`)"
-      - "traefik.http.services.radarr4k.loadbalancer.server.port=7879"
-      - "traefik.http.routers.radarr4k.tls=true"
-      - "traefik.http.routers.radarr4k.tls.certresolver=lets-encr"
+      - "traefik.http.routers.radarr4k.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.radarr4k.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.radarr4k.tls.certresolver=myresolver"
+      - "traefik.http.routers.radarr4k.rule=Host(`${DOMAIN}`) && PathPrefix(`/radarr4k`)"
+      - "traefik.http.services.radarr4k.loadbalancer.server.port=7878"
 
 networks:
   qbt-network:

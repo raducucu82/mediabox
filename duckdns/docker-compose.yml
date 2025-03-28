@@ -8,9 +8,9 @@ services:
       - PGID=1000 #optional
       - TZ=Europe/Bucharest #optional
       - SUBDOMAINS=calibreweb-my,emby-my,portainer-my,qbt-my,qbtbox
-      - TOKEN=5993b96c-d68b-4f65-987a-44b2efcd411c
+      - TOKEN=${DUCKDNS_TOKEN}
       - UPDATE_IP=ipv4 #optional
       - LOG_FILE=false #optional
     volumes:
-      - /data/duckdns/config:/config #optional
+      - ./config:/config #optional
     restart: unless-stopped

@@ -1,33 +1,53 @@
-version: '3'
-
 services:
-  reverse-proxy:
-    # The official v2 Traefik docker image
-    image: traefik:v2.11
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    restart: always
+    networks:
+      - qbt-network
+    command:
+      # Debug
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      # Common Properties
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # SSL/TSL Props
+      - "--entrypoints.websecure.http.tls.certResolver=myresolver" 
+      - "--entrypoints.websecure.http.tls.domains[0].main=${DOMAIN}"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=*.${DOMAIN}"
+      #- "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=${ACME_PROVIDER}"
+    environment:
+      - DUCKDNS_TOKEN=${DUCKDNS_TOKEN}
     ports:
-      # The HTTP port
       - "80:80"
       - "443:443"
-      # The Web UI (enabled by --api.insecure=true)
       - "8088:8080"
     volumes:
-      # So that Traefik can listen to the Docker events
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./acme.json:/acme.json 
-    networks:
-      - qbt-network
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   whoami:
-    # A container that exposes an API to show its IP address
-    image: traefik/whoami
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.org`)"
-      - "traefik.http.routers.whoami.tls.certresolver=lets-encr"
+    image: "traefik/whoami:latest"
+    container_name: "whoami"
+    restart: always 
     networks:
       - qbt-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
+      - "traefik.http.routers.whoami.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
 networks:
   qbt-network:

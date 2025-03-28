@@ -7,19 +7,21 @@ services:
       - PGID=1001
       - TZ=Etc/UTC
     volumes:
-      - /data/prowlarr:/config
+      - ./config:/config
     ports:
       - 9696:9696
     restart: unless-stopped
+    hostname: prowlarr 
     networks:
       - qbt-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.entrypoints=websecure"
-      - "traefik.http.routers.prowlarr.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/prowlarr`)"
+      - "traefik.http.routers.prowlarr.rule=Host(`${DOMAIN}`) && PathPrefix(`/prowlarr`)"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
-      - "traefik.http.routers.prowlarr.tls=true"
-      - "traefik.http.routers.prowlarr.tls.certresolver=lets-encr"
+      - "traefik.http.routers.prowlarr.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.prowlarr.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.prowlarr.tls.certresolver=myresolver"
+
 
 networks:
   qbt-network:

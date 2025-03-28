@@ -7,7 +7,8 @@ services:
       - PUID=1000
       - PGID=1000
     volumes:
-      - /media/big/syncthing:/var/syncthing
+      - /media/big2/syncthing:/var/syncthing
+      - /media/big2/books:/books
     networks:
       - qbt-network
     ports:
@@ -18,11 +19,11 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.syncthing.entrypoints=websecure"
-      - "traefik.http.routers.syncthing.rule=Host(`syncthing.qbtbox.duckdns.org`)"
+      - "traefik.http.routers.syncthing.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.syncthing.rule=Host(`syncthing.${DOMAIN}`)"
+      - "traefik.http.routers.syncthing.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.syncthing.tls.certresolver=myresolver"
       - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
-      - "traefik.http.routers.syncthing.tls=true"
-      - "traefik.http.routers.syncthing.tls.certresolver=lets-encr"
 
 
 networks:

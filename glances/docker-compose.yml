@@ -1,33 +1,35 @@
-version: '3'
-
 services:
   glances:
-    image: nicolargo/glances:ubuntu-latest-full 
+    image: nicolargo/glances:latest-full
     pid: host
+    restart: always
     networks:
       - qbt-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /data/glances/config:/config
+      - ./config:/etc/glances 
+      - /media/big1:/big1
+      - /media/big2:/big2
     ports:
       - 61208-61209:61208-61209
     environment:
       - "GLANCES_OPT=-w"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.glances.entrypoints=websecure"
-      - "traefik.http.routers.glances.rule=Host(`glances.qbtbox.duckdns.org`)"
+      - "traefik.http.routers.glances.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.glances.rule=Host(`glances.${DOMAIN}`)"
+      - "traefik.http.routers.glances.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.glances.tls.certresolver=myresolver"
       - "traefik.http.services.glances.loadbalancer.server.port=61208"
-      - "traefik.http.routers.glances.tls=true"
-      - "traefik.http.routers.glances.tls.certresolver=lets-encr"
+
     # For nvidia GPUs
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    #deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - driver: nvidia
+    #          count: 1
+    #          capabilities: [gpu]
 
 networks:
   qbt-network:

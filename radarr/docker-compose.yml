@@ -7,21 +7,23 @@ services:
       - PGID=1001
       - TZ=Etc/UTC
     volumes:
-      - /data/radarr/config:/config
-      - /media/big/media:/media
-      - /media/big/downloads:/downloads
+      - ./config:/config
+      - /media/big1/media:/media
+      - /media/big2/media:/media2
+      - /media/big1/downloads:/downloads
     ports:
       - 7878:7878
+    hostname: radarr
     networks:
       - qbt-network
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.radarr.entrypoints=websecure"
-      - "traefik.http.routers.radarr.rule=Host(`qbt-my.duckdns.org`) && PathPrefix(`/radarr`)"
+      - "traefik.http.routers.radarr.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.radarr.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.radarr.tls.certresolver=myresolver"
+      - "traefik.http.routers.radarr.rule=Host(`${DOMAIN}`) && PathPrefix(`/radarr`)"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
-      - "traefik.http.routers.radarr.tls=true"
-      - "traefik.http.routers.radarr.tls.certresolver=lets-encr"
 
 networks:
   qbt-network:

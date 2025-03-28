@@ -3,14 +3,14 @@ services:
     image: lscr.io/linuxserver/calibre-web:latest
     container_name: calibre-web
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Bucharest
       - DOCKER_MODS=linuxserver/mods:universal-calibre #optional
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1 #optional
     volumes:
-      - /data/calibre-web/config:/config
-      - /media/big/books:/books
+      - ./config:/config
+      - /media/big2/books:/books
     ports:
       - 8083:8083
     restart: unless-stopped
@@ -18,11 +18,11 @@ services:
       - qbt-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.calibre-web.entrypoints=websecure"
-      - "traefik.http.routers.calibre-web.rule=Host(`calibreweb-my.duckdns.org`)"
+      - "traefik.http.routers.calibre-web.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.calibre-web.rule=Host(`calibre.${DOMAIN}`)"
+      - "traefik.http.routers.calibre-web.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.calibre-web.tls.certresolver=myresolver"
       - "traefik.http.services.calibre-web.loadbalancer.server.port=8083"
-      - "traefik.http.routers.calibre-web.tls=true"
-      - "traefik.http.routers.calibre-web.tls.certresolver=lets-encr"
 
 networks:
   qbt-network:

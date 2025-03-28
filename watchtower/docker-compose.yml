@@ -2,6 +2,8 @@ services:
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
+    networks:
+      - qbt-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -10,3 +12,6 @@ services:
     command: --cleanup --debug
     restart: unless-stopped
 
+networks:
+  qbt-network:
+    external: true

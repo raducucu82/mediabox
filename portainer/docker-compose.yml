@@ -16,11 +16,11 @@ services:
       - "./portainer-data:/data"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.entrypoints=websecure"
-      - "traefik.http.routers.portainer.rule=Host(`portainer-my.duckdns.org`)"
+      - "traefik.http.routers.whoami.entrypoints=${WEB_ENTRYPOINT}"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.${DOMAIN}`)"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-      - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=lets-encr"
+      - "traefik.http.routers.whoami.tls=${TLS_ENABLED}"
+      - "traefik.http.routers.portainer.tls.certresolver=myresolver"
 
 networks:
   qbt-network:
